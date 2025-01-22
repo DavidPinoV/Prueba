@@ -43,7 +43,10 @@ static Arco* headArco = nullptr;
 static Ady* headAdy = nullptr;
 
 void crearNodos(int n) {
-    if(n==0){headNodo=new Nodo(65);}
+    if (n <= 0) return;
+    headNodo = new Nodo(65);
+
+    // Crear los siguientes nodos.
     for (int i = 1; i < n; i++) {
         char id = 65 + i;
         Nodo* nuevoNodo = new Nodo(id);
@@ -51,6 +54,7 @@ void crearNodos(int n) {
         headNodo = nuevoNodo;
     }
 }
+
 
 void LeerArchivo(const string& nombreArchivo) {
     ifstream archivo(nombreArchivo);
