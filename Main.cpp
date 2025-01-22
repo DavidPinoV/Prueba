@@ -30,8 +30,8 @@ public:
 
 class Arbol {
 public:
-    pair<char, int> nodo; // Nodo con su peso (caracter, peso acumulado)
-    vector<Arbol*> caminos; // Caminos recorridos desde este nodo
+    pair<char, int> nodo;
+    vector<Arbol*> caminos;
 
     Arbol(pair<char, int> nodo) : nodo(nodo) {}
 
@@ -40,15 +40,18 @@ public:
     }
 
     void imprimirRecorrido() {
-        cout << nodo.first << " (" << nodo.second << ")";
-        if (caminos.empty()) {
-            cout << endl;
-        } else {
-            cout << " -> ";
-            for (Arbol* camino : caminos) {
-                camino->imprimirRecorrido();
-            }
+        if(nodo.first==65){
+            cout << nodo.first << " (" << 0 << ")";
         }
+        else{
+            cout << nodo.first << " (" << nodo.second << ")";
+            
+        }
+        for (int i = 0; i<caminos.size();i++) {
+            cout << " -> ";
+            caminos[i]->imprimirRecorrido();
+        }
+        
     }
 };
 
@@ -81,10 +84,10 @@ Nodo* buscarNodos(int k, int n) {
     return nullptr;
 }
 
-void LeerArchivo(const string& nombreArchivo) {
+void LeerArchivo(string nombreArchivo) {
     ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
-        cerr << "No se pudo abrir el archivo: " << nombreArchivo << endl;
+        cerr << "No se leyo " << nombreArchivo << endl;
         return;
     }
     string linea;
@@ -107,9 +110,7 @@ void LeerArchivo(const string& nombreArchivo) {
             if (i != j && peso > 0) {
                 Nodo* nodoInicio = buscarNodos(i, n);
                 Nodo* nodoDestino = buscarNodos(j, n);
-                if (nodoInicio && nodoDestino) {
-                    nodoInicio->head->agregarConectores(peso, nodoDestino);
-                }
+                nodoInicio->head->agregarConectores(peso, nodoDestino);
             }
             j++;
         }
@@ -118,16 +119,16 @@ void LeerArchivo(const string& nombreArchivo) {
     archivo.close();
 }
 
-void dijkstra(Nodo* nodoInicio, int n, vector<int>& distancias, vector<int>& predecesores) {
+void dijkstra(Nodo* nodoInicio, int n, vector<int>& v1, vector<int>& v2) {
     vector<bool> visitados(n, false);
-    distancias[nodoInicio->id - 65] = 0;
+    v1[nodoInicio->id - 65] = 0;
 
     for (int i = 0; i < n; i++) {
         int nodoActualIndex = -1;
         int minDistancia = INT_MAX;
         for (int j = 0; j < n; j++) {
-            if (!visitados[j] && distancias[j] < minDistancia) {
-                minDistancia = distancias[j];
+            if (!visitados[j] && v1[j] < minDistancia) {
+                minDistancia = v1[j];
                 nodoActualIndex = j;
             }
         }
@@ -137,32 +138,36 @@ void dijkstra(Nodo* nodoInicio, int n, vector<int>& distancias, vector<int>& pre
         visitados[nodoActualIndex] = true;
         Nodo* nodoActual = buscarNodos(nodoActualIndex, n);
 
-        for (const auto& arista : nodoActual->head->secundario) {
-            Nodo* vecino = arista.second;
-            int peso = arista.first;
-            int vecinoIndex = vecino->id - 65;
+        for (int i = 0; i < nodoActual->head->secundario.size(); ++i) {
+            int peso = nodoActual->head->secundario[i].first;
+            Nodo* vecino = nodoActual->head->secundario[i].second;
+            int vecinoIndex = vecino->id - 'A';
 
-            if (!visitados[vecinoIndex] && distancias[nodoActualIndex] + peso < distancias[vecinoIndex]) {
-                distancias[vecinoIndex] = distancias[nodoActualIndex] + peso;
-                predecesores[vecinoIndex] = nodoActualIndex;
+            if (!visitados[vecinoIndex] && v1[nodoActualIndex] + peso < v1[vecinoIndex]) {
+                v1[vecinoIndex] = v1[nodoActualIndex] + peso;
+                v2[vecinoIndex] = nodoActualIndex;
             }
         }
+
     }
 }
 
-void reconstruirCamino(int destinoIndex, const vector<int>& predecesores, vector<char>& camino) {
+void reconstruirCamino(int destinoIndex, const vector<int>& v2, vector<char>& camino) {
     if (destinoIndex == -1) return;
-    reconstruirCamino(predecesores[destinoIndex], predecesores, camino);
+    reconstruirCamino(v2[destinoIndex], v2, camino);
     camino.push_back(destinoIndex + 65);
 }
 
-void procesarRuta() {
+void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destinoIndex, vector<char>& camino);
+
+void procesarRuta()
+{
     if (headNodo != nullptr) {
         Nodo* nodoInicio = headNodo;
-        vector<int> distancias(n, INT_MAX);
-        vector<int> predecesores(n, -1);
+        vector<int> v1(n, INT_MAX);
+        vector<int> v2(n, -1);
 
-        dijkstra(nodoInicio, n, distancias, predecesores);
+        dijkstra(nodoInicio, n, v1, v2);
         
         char destino;
         cout << "Ingrese el nodo que quieres llegar (Mayusculas): ";
@@ -170,34 +175,33 @@ void procesarRuta() {
 
         int destinoIndex = destino - 65;
         if (destinoIndex >= 0 && destinoIndex < n) {
-            if (distancias[destinoIndex] == INT_MAX) {
+            if (v1[destinoIndex] == INT_MAX) {
                 cout << "El nodo " << destino << " no conecta con A\n";
             } else {
-                cout << destino << " " << distancias[destinoIndex] << "\n";
+                cout << destino << " " << v1[destinoIndex] << "\n";
 
                 vector<char> camino;
-                reconstruirCamino(destinoIndex, predecesores, camino);
+                reconstruirCamino(destinoIndex, v2, camino);
 
-                cout << "Camino: ";
-                for (int i = 0; i < camino.size(); i++) {
-                    cout << camino[i];
-                    if (i < camino.size() - 1) cout << "->";
-                }
-                cout << "\n";
+                crearArbolImprimir(nodoInicio, v1, destinoIndex, camino);
 
-                Arbol* arbol = new Arbol({nodoInicio->id, distancias[destinoIndex]});
-                for (char c : camino) {
-                    Arbol* subArbol = new Arbol({c, distancias[c - 65]});
-                    arbol->agregarCamino(subArbol);
-                }
-
-                arbol->imprimirRecorrido();
+                cout<<endl;
             }
         } else {
-            cout << "El nodo ingresado no es válido.\n";
+            cout << "El nodo ingresado no existe compa.\n";
         }
     }
 }
+
+void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destinoIndex, vector<char>& camino) {
+    Arbol* arbol = new Arbol({nodoInicio->id, 0});
+    for (size_t i = 1; i < camino.size(); i++) {
+        Arbol* subArbol = new Arbol({camino[i], v1[camino[i] - 65]});
+        arbol->agregarCamino(subArbol);
+    }
+    arbol->imprimirRecorrido();
+}
+
 
 void imprimirTodosLosNodos() {
     Nodo* aux = headNodo;
