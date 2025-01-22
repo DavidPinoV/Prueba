@@ -152,13 +152,13 @@ void dijkstra(Nodo* nodoInicio, int n, vector<int>& v1, vector<int>& v2) {
     }
 }
 
-void reconstruirCamino(int destinoIndex, const vector<int>& v2, vector<char>& camino) {
-    if (destinoIndex == -1) return;
-    reconstruirCamino(v2[destinoIndex], v2, camino);
-    camino.push_back(destinoIndex + 65);
+void reconstruirCamino(int PuntoFinal, const vector<int>& v2, vector<char>& camino) {
+    if (PuntoFinal == -1) return;
+    reconstruirCamino(v2[PuntoFinal], v2, camino);
+    camino.push_back(PuntoFinal + 65);
 }
 
-void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destinoIndex, vector<char>& camino);
+void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int PuntoFinal, vector<char>& camino);
 
 void procesarRuta()
 {
@@ -169,21 +169,21 @@ void procesarRuta()
 
         dijkstra(nodoInicio, n, v1, v2);
         
-        char destino;
+        char PuntoFinal;
         cout << "Ingrese el nodo que quieres llegar (Mayusculas): ";
-        cin >> destino;
+        cin >> PuntoFinal;
 
-        int destinoIndex = destino - 65;
-        if (destinoIndex >= 0 && destinoIndex < n) {
-            if (v1[destinoIndex] == INT_MAX) {
-                cout << "El nodo " << destino << " no conecta con A\n";
+        int destino = PuntoFinal - 65;
+        if (destino >= 0 && destino < n) {
+            if (v1[destino] == INT_MAX) {
+                cout << "El nodo " << PuntoFinal << " no conecta con A\n";
             } else {
-                cout << destino << " " << v1[destinoIndex] << "\n";
+                cout << PuntoFinal << " " << v1[destino] << "\n";
 
                 vector<char> camino;
-                reconstruirCamino(destinoIndex, v2, camino);
+                reconstruirCamino(destino, v2, camino);
 
-                crearArbolImprimir(nodoInicio, v1, destinoIndex, camino);
+                crearArbolImprimir(nodoInicio, v1, destino, camino);
 
                 cout<<endl;
             }
@@ -193,7 +193,7 @@ void procesarRuta()
     }
 }
 
-void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destinoIndex, vector<char>& camino) {
+void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destino, vector<char>& camino) {
     Arbol* arbol = new Arbol({nodoInicio->id, 0});
     for (size_t i = 1; i < camino.size(); i++) {
         Arbol* subArbol = new Arbol({camino[i], v1[camino[i] - 65]});
@@ -214,6 +214,7 @@ void imprimirTodosLosNodos() {
 }
 
 int main() {
+    
     LeerArchivo("archivo.txt");
     imprimirTodosLosNodos();
     procesarRuta();
