@@ -40,37 +40,30 @@ public:
 
 static Nodo* headNodo = nullptr;
 static Arco* headArco = nullptr;
-void crearNodos(int n){
-    Nodo* aux = nullptr;
-    if (n == 0) {
-        char id = 65;
+static Ady* headAdy = nullptr;
+
+void crearNodos(int n) {
+    if(n==0){headNodo=new Nodo(65);}
+    for (int i = 1; i < n; i++) {
+        char id = 65 + i;
         Nodo* nuevoNodo = new Nodo(id);
-        return;
-    } else {
-        for (int i = 0; i < n; i++) {
-            char id = 65 + i;
-            Nodo* nuevoNodo = new Nodo(id);
-            if (headNodo == nullptr) {
-                headNodo = nuevoNodo;
-            } else {
-                aux->sig = nuevoNodo;
-            }
-            aux = nuevoNodo;
-        }
+        nuevoNodo->sig = headNodo;
+        headNodo = nuevoNodo;
     }
 }
+
 void LeerArchivo(const string& nombreArchivo) {
     ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
         cerr << "No se pudo abrir el archivo: " << nombreArchivo << endl;
         return;
     }
-
-    string linea;
+    string linea;    
     getline(archivo, linea);
+
     int n = stoi(linea);
     crearNodos(n);
-    
+
     while (getline(archivo, linea)) {
         if (linea.empty()) continue;
         
@@ -80,12 +73,8 @@ void LeerArchivo(const string& nombreArchivo) {
 }
 
 int main() {
-    string filename = "archivo.txt";
-    LeerArchivo(filename);
-    while(headNodo!=nullptr){
-        cout<<headNodo->id<<",";
-        headNodo = headNodo->sig;
-    }
+    LeerArchivo("archivo.txt");
 
     return 0;
 }
+
