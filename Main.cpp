@@ -78,8 +78,8 @@ void LeerArchivo(const string& nombreArchivo) {
         int peso;
         int j = 0;
         while (ss >> peso) {
-            if (ss.peek() == ',') ss.ignore(); // Ignorar comas
-            if (i != j && peso > 0) { // Si hay un peso válido y no es la diagonal principal
+            if (ss.peek() == ',') ss.ignore();
+            if (i != j && peso > 0) {
                 Nodo* nodoInicio = buscarNodos(i, n);
                 Nodo* nodoDestino = buscarNodos(j, n);
                 if (nodoInicio && nodoDestino) {
@@ -173,12 +173,21 @@ void procesarRuta() {
         }
     }
 }
-
+void imprimirTodosLosNodos(){
+    Nodo* aux = headNodo;
+    cout<<"Todos los nodos:";
+    while(aux->sig!=nullptr){
+        cout<<aux->id<<",";
+        aux = aux->sig;
+    }
+    cout<<aux->id<<"\n";
+}
 int main() {
     string archivo;
     cout<<"Ingrese el nombre del archivo: ";
     cin>>archivo;
     LeerArchivo(archivo);
+    imprimirTodosLosNodos();
     procesarRuta();
     
 
