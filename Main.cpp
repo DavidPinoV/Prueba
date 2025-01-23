@@ -169,7 +169,7 @@ void procesarRuta()
                 cout<<endl;
             }
         } 
-        else {cout << "El nodo ingresado no existe compa.\n";}
+        else {cout << "El nodo ingresado no existe compa o que esta en minuscula xD.\n";}
     }
 }
 void crearArbolImprimir(Nodo* nodoInicio, vector<int>& v1, int destino, vector<char>& camino) {
@@ -184,7 +184,7 @@ void imprimirTodosLosNodos() {
     Nodo* aux = NodoGrafo;
     cout << "Todos los nodos: ";
     while (aux->sig != nullptr) {
-        cout << aux->id << ", ";
+        cout << aux->id << " ";
         aux = aux->sig;
     }
     cout << aux->id << "\n";
