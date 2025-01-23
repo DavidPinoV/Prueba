@@ -137,7 +137,7 @@ void dijkstra(Nodo* nodoInicio, int n, vector<int>& v1, vector<int>& v2) {
         }
     }
 }
-void verCamino(int PuntoFinal, const vector<int>& v2, vector<char>& camino) {
+void verCamino(int PuntoFinal,vector<int>& v2, vector<char>& camino) {
     if (PuntoFinal == -1) return;
     verCamino(v2[PuntoFinal], v2, camino);
     camino.push_back(PuntoFinal + 65);
